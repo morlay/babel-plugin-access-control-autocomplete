@@ -55,12 +55,15 @@ const isNeedToMarkedAccessControlExpression = (
   return false;
 };
 
-const scanDeps = (nodePath: NodePath): Identifier[] => {
+const scanDeps = (nodePath: NodePath, ...excludes: string[]): Identifier[] => {
   const ids: { [k: string]: true } = {};
 
   nodePath.traverse({
     JSXIdentifier(nodePath: NodePath<JSXIdentifier>) {
-      if (isAccessControlComponent(nodePath.node.name)) {
+      if (
+        isAccessControlComponent(nodePath.node.name) &&
+        excludes.indexOf(nodePath.node.name) === -1
+      ) {
         ids[nodePath.node.name] = true;
       }
     },
@@ -179,7 +182,10 @@ export default () => ({
               init: callExpression(
                 callExpression(
                   identifier(opts.methodAccessControlSome),
-                  scanDeps(nodePath.get("init") as NodePath),
+                  scanDeps(
+                    nodePath.get("init") as NodePath,
+                    nodePath.node.id.name,
+                  ),
                 ),
                 [nodePath.node.init as any],
               ),
@@ -192,7 +198,10 @@ export default () => ({
               init: callExpression(
                 callExpression(
                   identifier(opts.methodAccessControlEvery),
-                  scanDeps(nodePath.get("init") as NodePath),
+                  scanDeps(
+                    nodePath.get("init") as NodePath,
+                    nodePath.node.id.name,
+                  ),
                 ),
                 [nodePath.node.init as any],
               ),

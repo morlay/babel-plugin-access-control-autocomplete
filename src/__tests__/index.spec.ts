@@ -36,6 +36,7 @@ export const AcSomeComponent = mustOneOfPermissions()(create(() => null));
     expect(
       transformCode(`
 export const AcComponent = () => <div>
+  <AcComponent />
   <AcComponent2 />
 </div>;
     `),
@@ -43,6 +44,7 @@ export const AcComponent = () => <div>
       unPad(`
 import { mustAllOfPermissions } from "src-core/access";
 export const AcComponent = mustAllOfPermissions(AcComponent2)(() => <div>
+  <AcComponent />
   <AcComponent2 />
 </div>);
 `),
