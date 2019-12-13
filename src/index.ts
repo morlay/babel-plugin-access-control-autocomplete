@@ -17,15 +17,16 @@ import {
   VariableDeclarator,
 } from "@babel/types";
 
-const isAccessControlEveryComponent = (id = "") =>
-  /^Ac(Every)?[A-Z].+/.test(id);
-const isAccessControlSomeComponent = (id = "") => /^AcSome[A-Z].+/.test(id);
+const isAccessControlEveryComponentOrHook = (id = "") =>
+  /^(use)?Ac(Every)?[A-Z].+/.test(id);
+const isAccessControlSomeComponentOrHook = (id = "") =>
+  /^(use)?AcSome[A-Z].+/.test(id);
 
-const isAccessControlComponent = (id = "") =>
-  isAccessControlEveryComponent(id) || isAccessControlSomeComponent(id);
+const isAccessControlComponentOrHook = (id = "") =>
+  isAccessControlEveryComponentOrHook(id) ||
+  isAccessControlSomeComponentOrHook(id);
 
 const isUseRequestHook = (id = "") => /^use(\w+)?Request$/.test(id);
-const isUseAcHook = (id = "") => /^useAc.+$/.test(id);
 
 const isCreateRequestMethod = (id = "") => /create(\w+)?Request$/.test(id);
 
@@ -65,7 +66,7 @@ const scanDeps = (nodePath: NodePath, ...excludes: string[]): Identifier[] => {
   nodePath.traverse({
     JSXIdentifier(nodePath: NodePath<JSXIdentifier>) {
       if (
-        isAccessControlComponent(nodePath.node.name) &&
+        isAccessControlComponentOrHook(nodePath.node.name) &&
         excludes.indexOf(nodePath.node.name) === -1
       ) {
         ids[nodePath.node.name] = true;
@@ -84,7 +85,7 @@ const scanDeps = (nodePath: NodePath, ...excludes: string[]): Identifier[] => {
           }
         }
 
-        if (isUseAcHook(nodePath.node.name)) {
+        if (isAccessControlComponentOrHook(nodePath.node.name)) {
           ids[nodePath.node.name] = true;
         }
       }
@@ -180,10 +181,10 @@ export default () => ({
 
         if (
           isIdentifier(nodePath.node.id) &&
-          isAccessControlComponent(nodePath.node.id.name) &&
+          isAccessControlComponentOrHook(nodePath.node.id.name) &&
           isNeedToMarkedAccessControlExpression(opts, nodePath.node.init)
         ) {
-          if (isAccessControlSomeComponent(nodePath.node.id.name)) {
+          if (isAccessControlSomeComponentOrHook(nodePath.node.id.name)) {
             state.methodAccessControlSomeUsed = true;
 
             nodePath.replaceWith({
@@ -199,7 +200,9 @@ export default () => ({
                 [nodePath.node.init as any],
               ),
             });
-          } else if (isAccessControlEveryComponent(nodePath.node.id.name)) {
+          } else if (
+            isAccessControlEveryComponentOrHook(nodePath.node.id.name)
+          ) {
             state.methodAccessControlEveryUsed = true;
 
             nodePath.replaceWith({
