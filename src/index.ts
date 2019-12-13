@@ -18,12 +18,16 @@ import {
 } from "@babel/types";
 
 const isAccessControlEveryComponent = (id = "") =>
-  id.startsWith("Ac") || id.startsWith("AcEvery");
-const isAccessControlSomeComponent = (id = "") => id.startsWith("AcSome");
+  /^Ac(Every)?[A-Z].+/.test(id);
+const isAccessControlSomeComponent = (id = "") => /^AcSome[A-Z].+/.test(id);
+
 const isAccessControlComponent = (id = "") =>
   isAccessControlEveryComponent(id) || isAccessControlSomeComponent(id);
-const isUseRequestHook = (id = "") => /use(\w+)?Request/.test(id);
-const isCreateRequestMethod = (id = "") => /create(\w+)?Request/.test(id);
+
+const isUseRequestHook = (id = "") => /^use(\w+)?Request$/.test(id);
+const isUseAcHook = (id = "") => /^useAc.+$/.test(id);
+
+const isCreateRequestMethod = (id = "") => /create(\w+)?Request$/.test(id);
 
 const isNeedToMarkedAccessControlExpression = (
   opts: State["opts"],
@@ -68,15 +72,20 @@ const scanDeps = (nodePath: NodePath, ...excludes: string[]): Identifier[] => {
       }
     },
     Identifier(nodePath: NodePath<Identifier>) {
-      if (
-        isCallExpression(nodePath.parent) &&
-        (isUseRequestHook(nodePath.node.name) ||
-          isCreateRequestMethod(nodePath.node.name))
-      ) {
-        const arg0 = nodePath.parent.arguments[0];
+      if (isCallExpression(nodePath.parent)) {
+        if (
+          isUseRequestHook(nodePath.node.name) ||
+          isCreateRequestMethod(nodePath.node.name)
+        ) {
+          const arg0 = nodePath.parent.arguments[0];
 
-        if (isIdentifier(arg0)) {
-          ids[arg0.name] = true;
+          if (isIdentifier(arg0)) {
+            ids[arg0.name] = true;
+          }
+        }
+
+        if (isUseAcHook(nodePath.node.name)) {
+          ids[nodePath.node.name] = true;
         }
       }
     },

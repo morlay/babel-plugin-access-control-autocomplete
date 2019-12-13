@@ -51,22 +51,24 @@ export const AcComponent = mustAllOfPermissions(AcComponent2)(() => <div>
     );
   });
 
-  it("should mark with useXRequest hook arg", () => {
+  it("should mark with useXRequest hook arg and useAcX", () => {
     expect(
       transformCode(`
 import { mustAllOfPermissions } from "src-core/access";
 export const AcComponent = () => {
   useRequest(putApp, {});
-  useTempDataForRequest(listApp, {})
+  useTempDataForRequest(listApp, {});
+  useAcHook();
   return null;
 };
 `),
     ).toEqual(
       unPad(`
 import { mustAllOfPermissions } from "src-core/access";
-export const AcComponent = mustAllOfPermissions(listApp, putApp)(() => {
+export const AcComponent = mustAllOfPermissions(listApp, putApp, useAcHook)(() => {
   useRequest(putApp, {});
   useTempDataForRequest(listApp, {});
+  useAcHook();
   return null;
 });`),
     );
@@ -76,13 +78,13 @@ export const AcComponent = mustAllOfPermissions(listApp, putApp)(() => {
     expect(
       transformCode(`
 export const AcComponent = createSearchInputOfRequest(listApp)(() => null);
-export const AcComponent2 = createSearchInputOfRequest(listApp);
+export const AcComponent2 = createSearchInputOfRequest(listApp, {});
 `),
     ).toEqual(
       unPad(`
 import { mustAllOfPermissions } from "src-core/access";
 export const AcComponent = mustAllOfPermissions(listApp)(createSearchInputOfRequest(listApp)(() => null));
-export const AcComponent2 = mustAllOfPermissions(listApp)(createSearchInputOfRequest(listApp));
+export const AcComponent2 = mustAllOfPermissions(listApp)(createSearchInputOfRequest(listApp, {}));
 `),
     );
   });
