@@ -24,6 +24,7 @@ const isAccessControlSomeComponent = (id = "") => id.startsWith("AcSome");
 const isAccessControlComponent = (id = "") =>
   isAccessControlEveryComponent(id) || isAccessControlSomeComponent(id);
 const isUseRequestHook = (id = "") => /use(\w+)?Request/.test(id);
+const isCreateRequestMethod = (id = "") => /create(\w+)?Request/.test(id);
 
 const isNeedToMarkedAccessControlExpression = (
   opts: State["opts"],
@@ -33,10 +34,24 @@ const isNeedToMarkedAccessControlExpression = (
     return true;
   }
   if (isCallExpression(e) && isIdentifier(e.callee)) {
-    return !(
-      e.callee.name === opts.methodAccessControlEvery ||
-      e.callee.name === opts.methodAccessControlSome
-    );
+  }
+
+  if (isCallExpression(e)) {
+    if (isIdentifier(e.callee)) {
+      const callName = e.callee.name;
+
+      return !(
+        callName === opts.methodAccessControlEvery ||
+        callName === opts.methodAccessControlSome
+      );
+    } else if (isCallExpression(e.callee) && isIdentifier(e.callee.callee)) {
+      const callName = e.callee.callee.name;
+
+      return !(
+        callName === opts.methodAccessControlEvery ||
+        callName === opts.methodAccessControlSome
+      );
+    }
   }
   return false;
 };
@@ -50,18 +65,21 @@ const scanDeps = (nodePath: NodePath): Identifier[] => {
         ids[nodePath.node.name] = true;
       }
     },
-    CallExpression(nodePath: NodePath<CallExpression>) {
-      if (
-        isIdentifier(nodePath.node.callee) &&
-        isUseRequestHook(nodePath.node.callee.name) &&
-        nodePath.node.arguments[0]
-      ) {
-        const arg0 = nodePath.node.arguments[0];
+    CallExpression: {
+      exit(nodePath: NodePath<CallExpression>) {
+        if (
+          isIdentifier(nodePath.node.callee) &&
+          (isUseRequestHook(nodePath.node.callee.name) ||
+            isCreateRequestMethod(nodePath.node.callee.name)) &&
+          nodePath.node.arguments[0]
+        ) {
+          const arg0 = nodePath.node.arguments[0];
 
-        if (isIdentifier(arg0)) {
-          ids[arg0.name] = true;
+          if (isIdentifier(arg0)) {
+            ids[arg0.name] = true;
+          }
         }
-      }
+      },
     },
   });
 

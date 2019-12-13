@@ -19,15 +19,15 @@ const AcComponent = mustAllOfPermissions()(() => null);
   it("should mark", () => {
     expect(
       transformCode(`
-export const AcComponent = () => null;
-export const AcSomeComponent = () => null;
+export const AcComponent = hoc()(() => null);
+export const AcSomeComponent = create(() => null);
     `),
     ).toEqual(
       unPad(`
 import { mustAllOfPermissions } from "src-core/access";
 import { mustOneOfPermissions } from "src-core/access";
-export const AcComponent = mustAllOfPermissions()(() => null);
-export const AcSomeComponent = mustOneOfPermissions()(() => null);
+export const AcComponent = mustAllOfPermissions()(hoc()(() => null));
+export const AcSomeComponent = mustOneOfPermissions()(create(() => null));
 `),
     );
   });
@@ -67,6 +67,19 @@ export const AcComponent = mustAllOfPermissions(listApp, putApp)(() => {
   useTempDataForRequest(listApp, {});
   return null;
 });`),
+    );
+  });
+
+  it("should mark with createXRequest hoc arg", () => {
+    expect(
+      transformCode(`
+export const AcComponent = createXXXRequest(listApp)(() => null);
+`),
+    ).toEqual(
+      unPad(`
+import { mustAllOfPermissions } from "src-core/access";
+export const AcComponent = mustAllOfPermissions(listApp)(createXXXRequest(listApp)(() => null));
+`),
     );
   });
 
