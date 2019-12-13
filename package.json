@@ -1,0 +1,59 @@
+{
+  "name": "babel-plugin-access-control-autocomplete",
+  "version": "0.1.0",
+  "main": "lib/index.js",
+  "types": "src/index.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "license": "WTFPL",
+  "author": "Morlay Null <morlay.null@gmail.com>",
+  "scripts": {
+    "fmt": "prettier --write 'src/**/*.{ts,tsx,json,md}'",
+    "build": "tsc",
+    "test": "npm run fmt && jest",
+    "prepare": "npm test && npm run build"
+  },
+  "devDependencies": {
+    "@babel/core": "7.7.x",
+    "@types/babel__core": "7.1.x",
+    "@types/babel__traverse": "7.0.x",
+    "@types/jest": "24.0.x",
+    "@types/node": "12.12.x",
+    "jest": "24.9.x",
+    "prettier": "1.19.x",
+    "ts-jest": "24.2.x",
+    "ts-node": "8.5.x",
+    "typescript": "3.7.x"
+  },
+  "peerDependencies": {
+    "@babel/traverse": "7.x",
+    "@babel/types": "7.x"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "tsx",
+      "ts",
+      "json",
+      "jsx",
+      "js"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "testRegex": ".*/__tests__/.+\\.(test|spec)\\.(ts|tsx)$"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morlay/babel-plugin-access-control-autocomplete.git"
+  },
+  "bugs": {
+    "url": "https://github.com/morlay/babel-plugin-access-control-autocomplete/issues"
+  },
+  "homepage": "https://github.com/morlay/babel-plugin-access-control-autocomplete#readme"
+}
