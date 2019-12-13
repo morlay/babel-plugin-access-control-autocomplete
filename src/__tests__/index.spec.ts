@@ -73,12 +73,14 @@ export const AcComponent = mustAllOfPermissions(listApp, putApp)(() => {
   it("should mark with createXRequest hoc arg", () => {
     expect(
       transformCode(`
-export const AcComponent = createXXXRequest(listApp)(() => null);
+export const AcComponent = createSearchInputOfRequest(listApp)(() => null);
+export const AcComponent2 = createSearchInputOfRequest(listApp);
 `),
     ).toEqual(
       unPad(`
 import { mustAllOfPermissions } from "src-core/access";
-export const AcComponent = mustAllOfPermissions(listApp)(createXXXRequest(listApp)(() => null));
+export const AcComponent = mustAllOfPermissions(listApp)(createSearchInputOfRequest(listApp)(() => null));
+export const AcComponent2 = mustAllOfPermissions(listApp)(createSearchInputOfRequest(listApp));
 `),
     );
   });

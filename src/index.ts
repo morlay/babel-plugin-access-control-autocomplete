@@ -1,7 +1,6 @@
 import { NodePath } from "@babel/traverse";
 
 import {
-  CallExpression,
   callExpression,
   Expression,
   Identifier,
@@ -65,21 +64,18 @@ const scanDeps = (nodePath: NodePath): Identifier[] => {
         ids[nodePath.node.name] = true;
       }
     },
-    CallExpression: {
-      exit(nodePath: NodePath<CallExpression>) {
-        if (
-          isIdentifier(nodePath.node.callee) &&
-          (isUseRequestHook(nodePath.node.callee.name) ||
-            isCreateRequestMethod(nodePath.node.callee.name)) &&
-          nodePath.node.arguments[0]
-        ) {
-          const arg0 = nodePath.node.arguments[0];
+    Identifier(nodePath: NodePath<Identifier>) {
+      if (
+        isCallExpression(nodePath.parent) &&
+        (isUseRequestHook(nodePath.node.name) ||
+          isCreateRequestMethod(nodePath.node.name))
+      ) {
+        const arg0 = nodePath.parent.arguments[0];
 
-          if (isIdentifier(arg0)) {
-            ids[arg0.name] = true;
-          }
+        if (isIdentifier(arg0)) {
+          ids[arg0.name] = true;
         }
-      },
+      }
     },
   });
 
