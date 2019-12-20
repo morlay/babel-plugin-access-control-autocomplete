@@ -66,7 +66,7 @@ export const AcComponent = () => {
     ).toEqual(
       unPad(`
 import { mustAllOfPermissions } from "src-core/access";
-const useAcHook = mustAllOfPermissions(listApp)(() => useTempDataForRequest(listApp, {}));
+const useAcHook = mustAllOfPermissions(listApp)(() => useTempDataForRequest(listApp, {}), true);
 export const AcComponent = mustAllOfPermissions(listApp, putApp, useAcHook)(() => {
   useRequest(putApp, {});
   useTempDataForRequest(listApp, {});

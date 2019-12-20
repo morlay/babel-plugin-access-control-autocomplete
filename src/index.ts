@@ -145,6 +145,18 @@ function resolveOpts(opts: State["opts"] = {} as any) {
   };
 }
 
+function argsFromExpr(e: Expression, id: Identifier) {
+  if (id.name.startsWith("use")) {
+    return [
+      e as any,
+      identifier("true"),
+    ];
+  }
+
+
+  return [e];
+}
+
 export default () => ({
   name: "access-control-autocomplete",
   visitor: {
@@ -197,7 +209,7 @@ export default () => ({
                     nodePath.node.id.name,
                   ),
                 ),
-                [nodePath.node.init as any],
+                argsFromExpr(nodePath.node.init!, nodePath.node.id),
               ),
             });
           } else if (
@@ -215,7 +227,7 @@ export default () => ({
                     nodePath.node.id.name,
                   ),
                 ),
-                [nodePath.node.init as any],
+                argsFromExpr(nodePath.node.init!, nodePath.node.id),
               ),
             });
           }
