@@ -152,8 +152,6 @@ function argsFromExpr(e: Expression, id: Identifier) {
       identifier("true"),
     ];
   }
-
-
   return [e];
 }
 
