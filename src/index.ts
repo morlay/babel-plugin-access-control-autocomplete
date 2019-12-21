@@ -127,9 +127,9 @@ function findLast<T>(arr: T[], predicate: (item: T) => boolean): T | null {
 
 interface State {
   opts: {
-    libAccessControl: "src-core/access";
-    methodAccessControlSome: "mustOneOfPermissions";
-    methodAccessControlEvery: "mustAllOfPermissions";
+    libAccessControl: string;
+    methodAccessControlSome: string;
+    methodAccessControlEvery: string;
   };
   methodAccessControlSomeUsed?: boolean;
   methodAccessControlEveryUsed?: boolean;
